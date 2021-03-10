@@ -1,84 +1,8 @@
-引言：
-
-暴力字符匹配时间复杂度                        $O(n^3)$
-
-暴力枚举字符串回文中心，时间复杂度$O(n^2)$
-
-而马拉车算法的本质，是对暴力枚举字符串回文中心的优化，**充分利用了回文串的对称性**。
-
-为了方便说明，现在只考虑奇回文字串，即长度为奇数的回文子串。（偶回文字串同理，在最后面会说明二者如何统一）
-
-`d[]`数组，`d[i]`表示以位置`i`为中心最长回文字串边界到中心的距离。
-
 ```cpp
-Example:
 
-     d b a b a b a b c
-	i  0 1 2 3 4 5 6 7 8
-d[i] 1 1 2 3 4 3 2 1 1
-```
-
-现在开始计算`S[i]` 处的答案`d[i]` 
-
-为了利用对称性，我们需要在过程中维护一个当前已知最右回文子串`S[l...r]`
-
-则有`s[i]` 所处位置的两种情况：
-
-1. 在最右回文字串的右边：`...S[l]...S[r]...S[i]...` 
-2. 在最右回文字串中：        `...S[l]...S[i]...S[r]...` 
-
+cout << "有"
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png)内鬼
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png)禁止
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png)交易
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png)。
 ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f8ae05a8-6939-4122-bc33-91909c992c59/Untitled.png)
-
-`S[l]..S[r]`对应最右回文串，对应的就是**已知的在最右边的回文串。( 这个是必须先认知的 ）**
-
-遍历变量`i`与最右回文串`S[l]..S[r]`的位置关系有以下情形：
-
-1.  
-
-    `...S[l]...S[r]...S[i]...` 
-
-    这时我们并没有对称信息可以利用，对应`d[i]`只能暴力求：
-
-    我们先暴力求出以`S[i]`为中心的最长回文字串，并得到`d[i]`，并更新 `r → i+d[i]-1`
-
-    在这个过程中，我们暴力比较了`d[i]`次，且让`r` 增加到`i+d[i]-1`
-
-    即最右回文字串的右端点的增量大于我们暴力的次数。$\Delta r \geq 暴力次数d[i]$
-
-    > 简单来说，就是当i在已知最右回文串右边的时候，暴力枚举出S[i]的回文串，并更新为最右回文串。
-
-2.  
-
-    对于以`S[m]`为中心最长回文字串与最右回文字串，有三中不同位置关系:
-
-    `m`对应上图中的`mirror`
-
-    ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f6190d-bcc1-4615-a4de-e06cf5e8d55e/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/85f6190d-bcc1-4615-a4de-e06cf5e8d55e/Untitled.png)
-
-    总结来就`S[m]`对应的回文串与最右回文字串的**内含**、**内切**、**相交**关系。（我造的关系词，感觉有丢丢直观..QAQ）
-
-我们对情形2的讨论，可以用一行代码总结：
-
-`d[i]=min(r-i+1,d[mirror]);`
-
-大可以看完一下解释后再回过头看细看这行代码
-
-下面三者的判定，是根据`m`对应的回文串与最右回文串左边界的距离判定的。
-
-- 情形2.1，根据最右回文子串的对称性，显然`d[i]=d[m]`
-- 情形2.2：想求以`S[i]`为中心的最长回文串，可能需要遍历出界外，暴力枚举即可，若出界则更新最右回文串。
-- 情形2.3，根据以上，可知：最右边回文字串不可能向两边同时再拓展，即`S[l-1]..S[r+1]` 不可能是回文串。
-
-    （换句话理解，如果右边能拓展，那么左边也能拓展，即两边都能拓展，这与上文矛盾。）情况类似2.1
-
-> 考虑那么多情况，很可能劝退一部分同学，但这是出于严谨性的证明，而在代码中，不一定要写得那么累赘。知其然知其所以然是我的本意。
-
-最后再补一下前面挖的坑：
-
-如果是偶回文串，则可以加特殊字符，如'#'，插在所有字符之间 以及前后。使得其成为奇回文串，由回文串的对称性可知这不会影响我们的结果。
-
-由此可以延伸出，再给字符串前后补上类似'&'、'$'的不会在所求字符串中出现的字符，则边界问题都不需要考虑啦！
-
-初学Manacher，讲的有不妥之处，还请多多指点。
-
-感谢看到最后的你！
